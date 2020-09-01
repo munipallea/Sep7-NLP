@@ -1,6 +1,6 @@
-# Sampling and Ensemble Learning
+# Sentiment Analysis, NLP and Named Entity Recognition
 
-__Title__: Application of ensemble learning on an imbalanced mortgage loan dataset <br />
+__Title__: Tales from crypto <br />
 __Submitted by__: Amar Munipalle <br />
 
 ## 1. Introduction
