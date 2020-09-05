@@ -3,102 +3,94 @@
 __Title__: Tales from crypto <br />
 __Submitted by__: Amar Munipalle <br />
 
-## 1. Introduction
+## 1. Introduction and Technical Tools
 
-The underlying dataset classifies mortgage loans into various risk categories. Explatory variables include DSR, home ownership patterns, borrower income and derogatory notes on file. Key challenge in dataset is the imbalanced nature of the class and usage of 
-Imbalanced class here meaning - significantly more which are low risk vs. current in dataset
+The attached Jupyter notebook uses several Natural Language Processing dependencies to access sentiment evolution around two popular crypto currencies - Bitcoin and Ethereum.
+Imports include (descriptions sourced from official documentation):
+    NLTK: NLTK is a leading platform for building Python programs to work with human language data. It provides easy-to-use interfaces to over 50 corpora and lexical resources such as WordNet, along with a suite of text processing libraries for classification, tokenization, stemming, tagging, parsing, and semantic reasoning, wrappers for industrial-strength NLP libraries, and an active discussion forum.
 
-| Class |Numbers |
-| ---- | ------- |
-| Low Risk | 75036|
-| High Risk |  2500 |
+    Vader sentiment analysis: VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-based sentiment analysis tool that is specifically attuned to sentiments expressed in social media. It is fully open-sourced under the [MIT License] (we sincerely appreciate all attributions and readily accept most contributions, but please don’t hold us liable).
 
+    Spacy for Named Entity Recognition: Spacy is an Industrial-Strength Natural Language Processing import in Python
 
-### 1.1 Technical Tools Used
-Imbalanced learn - a python package offering a number of re-sampling techniques commonly used in datasets showing strong between-class imbalance.   
-Standard scikit learn machine learning tools
+    Newsapi:  per site is the unofficial Python client library to integrate News API into your Python application without worrying about what's going on under the hood.
 
-* [Imbalanced Learn](https://pypi.org/project/imbalanced-learn/)
-
-### 1.2 Pre-processing prior to application of logistic regression
-
-![Credit Risk](images/credit-risk.jpg)
-
-a. Features extracted from dataset by excluding risk classification
-b. Standard scaler package is applied on the non categorical components of dataset (all except homeowner)
-c. Onehot encoder applied to homeowner to derive a sparse dummy variable matrix
-d. Logistic regression applied to both the scaled and non scaled datasets
-e. Scaled model performs significantly better per balance accuracy scores and recall metrics below. Stated differently this model predicts the high risk scores better in this imbalanced asset class
-| Metric |Scaled |Non Scaled |
-| -------| ------|-----------|
-| BAS    | 0.954 |   0.989   |
-| Recall |  0.91 |     0.98  |
+* [Newsapi](https://newsapi.org/)
+* [spacy](https://spacy.io/)
+* [NLTK](https://www.nltk.org/)
 
 
-## 2. Performance of oversampling and undersampling models
+## 2. Sentiment Analysis
 
-The following oversampling, undersampling and combination models were applied
+![Sentimental](images/sentimental.jpeg)
 
-* [Random Oversampling](https://pypi.org/project/imbalanced-learn/)
-* [SMOTE ](https://pypi.org/project/imbalanced-learn/#id30)
-* [SMOTENN](https://pypi.org/project/imbalanced-learn/#id33)
-
-### Comparison of sampling models
-
-| Metric |Naive-ROS |SMOTE-OS |Cluster-US|SMOTENN-Comb|
-| -------| ---------|---------|----------|------------|
-| BAS    | 0.994    |   0.95 |  0.982   |  0.994     |
-| Recall |  0.99    |   0.99|  0.99   |  0.99      |
-| Geomet |  0.99    |   0.95|  0.98   |  0.99      |
-
-The combination model which combines over and undersampling performs strongly. The Random Oversampling performance is comparable, but has a lower recall score for the low risk class which renders Combination more powerful.
-Jupyter notebook includes confusion matrices, balanced accuracy score and classification reports for each of the sampling techniques. The key metrics to monitor are Recall for negative class as this speaks directly to correctly predict (or miss) hgher risk loans which present significant costs to the company and hence are the most important metric to monitor.
-
-### 2.2 Ensemble Learning Models
-
-As the dataset is identical, a similar set of data processing steps is performed. For these sets of models scaling and over/undersampling methods are not applied given the high-variance / low bias features of the individual learners. For e.g. Balanced Random Forest randomly under-samples each boostrap sample to balance it. Hence addtional sample manipulation techniques are not required.
-
-* [Balanced Random Forest](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.ensemble.BalancedRandomForestClassifier.html#)
-
-Adaboost is another ensemble learning model that is used.
-* [Adaboost](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostClassifier.html)
-
-Images below present sample confusion matrices and feature maps of Balanced Random Forest
+The Newsapi client is used to download articles with Bitcoin and Ethereum keywords between certain dates (Aug 2020). The resulting object is manipulated and cleaned using a function call to store content of article in a Pandas dateframe to facilitate cleaning, analyis and analytics including sentiment analysis.
+To keep code dry this implementation is through a function call. Extensive use of lambda functions, regex and .apply methods to manipulate and clean data.
+In summary:
+Bitcoin has highest mean positive score (0.079947) vs. Ethereum (0.051500)
+Ethereum has the highest compound score (mean and max .16/-.08 .81/.79)
+Ethereum has highest positive score (max .27/.21)
+#### Neutral Sentiment dominates. Significantly higher mean, max and quartlies.
 
 <p align="center">
-<img src="images/ConfMatrix_BRF.png" width="600" height="300"/>
+<img src="images/eth_sent.png" width="600" height="300"/>
 </p>
 
 <p align="center">
-Figure 1.Confusion Matrix Sample
+Figure 1.Ethereum Sentiment Distribution
 </p>
 
 <p align="center">
-<img src="images/Features_BRF.png" width="600" height="300"/>
+<img src="images/bit_sent.png" width="600" height="300"/>
 </p>
 
 <p align="center">
-Figure 2. Feature strenght sample
+Figure 2.Bitcoin Sentiment Distribution
 </p>
-
-
-### 2.3 Comparison of Balanced Random Forest and Adaboost
-
-| Metric |BRF       |  ADA    |
-| -------| ---------|---------|
-| BAS    | 0.993    |  0.994  |
-| Recall |  0.99    |   0.99  |
-| Geomet |  0.99    |   0.99  | 
-
-Adaboost is stronger performer though both models are robust.
-
-Key features in order of importance are
-Feature #1: Interest Rate
-Feature #2: Total Debt
-Feature #3: Loan Size
-Feature #4: Borrower Income
-Feature #5: Debt to Income
 
 <p align="center">
-<img src="images/Features_BRF.png" width="600" height="300"/>
+<img src="images/bit_sent_time.png" width="600" height="300"/>
 </p>
+
+<p align="center">
+Figure 3. Bitcoin Sentiment Over Time
+</p>
+
+
+## 3. Natural Language Processing N-grams and Frequency Analysis
+Using common NLTK algorithms like tokenization (decomposing into words and sentences), lemmatization (root words), stop words (noise and filler words in texts) and named entity recognition important pairwise distributions of words (N-grams) are generated.
+Certain contextual words like (Reuters, chars etc.) are added to stop word corpus given their occurence and lack of informational value in articles.
+
+
+## 4. Wordclouds
+
+Wordclouds present a visual graphic of word tokens. By generating in a multi colour format key themes and messages can be extracted and conveyed to an executive audience.
+Ethereum WC is enclosed below. Second order inferences (apart from obvious dominance of words like ) include connectedness (Network), recent market volatility (valuation, trading) and potential applications like DeFi and decentralized finance.
+<p align="center">
+<img src="images/Eth_WC.png" width="600" height="300"/>
+</p>
+
+<p align="center">
+Figure 4.Ethereum WC
+</p>
+
+#### It is interesting to note the 'dont trust' theme in Bitcoin relates to its negative sentiment (relatively)
+
+<p align="center">
+<img src="images/bit_wc.png" width="600" height="300"/>
+</p>
+
+<p align="center">
+Figure 2.Bitcoin Wordcloud
+</p>
+
+
+## 4. Named Entity Recognition
+
+Per spacy, a named entity is a “real-world object” that’s assigned a name – for example, a person, a country, a product or a book title. spaCy can recognize various types of named entities in a document, by asking the model for a prediction. Because models are statistical and strongly depend on the examples they were trained on, this doesn’t always work perfectly and might need some tuning later, depending on your use case.
+
+* [Named Entity Recognition](https://spacy.io/usage/linguistic-features#named-entities)
+
+Prior to commencing NER a significant amount of cleanup is completed on the raw text data. This is similar to the sentiment analysis and includes lemmatization, tokenization and stop words. Jupyter notebook includes rich output on the two coins and associated NER
+
+A quick analysis of the bitcoin NER posits as to why sentiment is negative - several articles covering fraud (NK hackers) and scams likely contributed to a low NPR
